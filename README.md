@@ -30,3 +30,5 @@ g++ -std=c++11 test.cpp -o test;
 * Basic operations like add, mul, div, sub
 * Power
 * Relu
+* Sigmoid
+* Tanh
