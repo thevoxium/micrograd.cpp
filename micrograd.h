@@ -89,7 +89,7 @@ class Value{
     }
 
     Value sigmoid() const{
-        double sig = 1.0/(1+exp(-1*this->data));
+        double sig = 1.0/(1+std::exp(-1*this->data));
         double der = sig * (1-sig);
         Value out(sig);
         out._prev = {this};
@@ -103,7 +103,7 @@ class Value{
 
 
     Value tanh() const{
-        double t = (exp(this->data)-exp(-1.0*this->data)) / (exp(this->data)+exp(-1.0*this->data));
+        double t = (std::exp(this->data)-std::exp(-1.0*this->data)) / (std::exp(this->data)+std::exp(-1.0*this->data));
         Value out(t);
         out._prev = {this};
         out._op = "tanh";
@@ -113,6 +113,43 @@ class Value{
         };
         return out;
     };
+
+
+    Value log() const {                                                                                                                                                                                                                          
+        Value out(std::log(this->data));                                                                                                                                                                                                              
+        out._prev = {this};                                                                                                                                                                                                                      
+        out._op = "log";                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                
+        out._backward = [this, &out]() {                                                                                                                                                                                                         
+            const_cast<Value*>(this)->grad += (1.0 / this->data) * out.grad;                                                                                                                                                                     
+        };                                                                                                                                                                                                                                       
+        return out;                                                                                                                                                                                                                              
+    }
+
+    Value exp() const {                                                                                                                                                                                                                          
+        double exp_val = std::exp(this->data);                                                                                                                                                                                                        
+        Value out(exp_val);                                                                                                                                                                                                                      
+        out._prev = {this};                                                                                                                                                                                                                      
+        out._op = "exp";                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                
+        out._backward = [this, &out, exp_val]() {                                                                                                                                                                                                
+            const_cast<Value*>(this)->grad += exp_val * out.grad;                                                                                                                                                                                
+        };                                                                                                                                                                                                                                       
+        return out;                                                                                                                                                                                                                              
+    }
+
+    Value sqrt() const {                                                                                                                                                                                                                         
+        double sqrt_val = std::sqrt(this->data);                                                                                                                                                                                                      
+        Value out(sqrt_val);                                                                                                                                                                                                                     
+        out._prev = {this};                                                                                                                                                                                                                      
+        out._op = "sqrt";                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                
+        out._backward = [this, &out, sqrt_val]() {                                                                                                                                                                                               
+            const_cast<Value*>(this)->grad += (0.5 / sqrt_val) * out.grad;                                                                                                                                                                       
+        };                                                                                                                                                                                                                                       
+        return out;                                                                                                                                                                                                                              
+    }
+    
 
     void backward() const {                                                                                                                                                                                                                      
         std::vector<const Value*> topo;                                                                                                                                                                                                          
