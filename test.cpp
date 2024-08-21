@@ -27,12 +27,12 @@ int main() {
   Value i = a / b;
   std::cout << "Division: " << i.str() << std::endl;
 
-  Value s = a.sigmoid();
-  std::cout << "Sigmoid: " << s.str() << std::endl;
+  Value s = a.tanh();
+  std::cout << "tanh: " << s.str() << std::endl;
 
   Value x(2.0), y(3.0);
   Value z = x * y;
-  Value t = z.sigmoid();
+  Value t = z.tanh();
   t.backward();
   std::cout << "Backward (x): " << x.str() << std::endl;
   std::cout << "Backward (y): " << y.str() << std::endl;

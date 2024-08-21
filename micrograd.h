@@ -101,6 +101,19 @@ class Value{
         return out;
     }
 
+
+    Value tanh() const{
+        double t = (exp(this->data)-exp(-1.0*this->data)) / (exp(this->data)+exp(-1.0*this->data));
+        Value out(t);
+        out._prev = {this};
+        out._op = "tanh";
+
+        out._backward = [this, t, &out](){
+            const_cast<Value*>(this)->grad += (1-t*t)*out.grad;
+        };
+        return out;
+    };
+
     void backward() const {                                                                                                                                                                                                                      
         std::vector<const Value*> topo;                                                                                                                                                                                                          
         std::set<const Value*> visited;                                                                                                                                                                                                          
