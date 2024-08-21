@@ -1,48 +1,29 @@
 #include <iostream>
-
-#include "micrograd.h"
+#include <cstdlib>
+//#include "micrograd.h"
+#include "grad_descent.h"
 
 int main() {
-  // Value a(3.0);
 
-  // Value b(4.0);
-  // Value c = a + b;
-  // std::cout << "Addition: " << c.str() << std::endl;
 
-  // Value d = a * b;
-  // std::cout << "Multiplication: " << d.str() << std::endl;
+  vector<Value*> x, y, params;
+  for (int i=0; i<1; i++){
+    Value t(45);
+    x.push_back(&t);
+  }
+  for (int i=0; i<1; i++){
+    Value t(90);
+    y.push_back(&t);
+  }
+  for (int i=0; i<1; i++){
+    Value t(0);
+    params.push_back(&t);
+  }
 
-  // Value e = a.power(2);
-  // std::cout << "Power: " << e.str() << std::endl;
 
-  // Value f = Value(-2.0).relu();
-  // std::cout << "ReLU: " << f.str() << std::endl;
+  double learningRate = 0.00001;
+  int epochs = 1000;
 
-  // Value g = -a;
-  // std::cout << "Negation: " << g.str() << std::endl;
-
-  // Value h = a - b;
-  // std::cout << "Subtraction: " << h.str() << std::endl;
-
-  // Value i = a / b;
-  // std::cout << "Division: " << i.str() << std::endl;
-
-  // Value s = a.tanh();
-  // std::cout << "tanh: " << s.str() << std::endl;
-
-  // Value x(2.0), y(3.0);
-  // Value z = x * y;
-  // Value t = z.tanh();
-  // t.backward();
-  // std::cout << "Backward (x): " << x.str() << std::endl;
-  // std::cout << "Backward (y): " << y.str() << std::endl;
-
-  Value x(2);                                                                                                                                                                                                                                      
-  Value y = x.log();     
-  cout<<y.str()<<endl;                                                                                                                                                                                                                          
-  Value z = x.exp();     
-  cout<<z.str()<<endl;                                                                                                                                                                                                               
-  z.backward();                                                                                                                                                                                                                                    
-  cout << x.str() << endl; 
+  train(epochs, learningRate, params, x, y);
   return 0;
 }

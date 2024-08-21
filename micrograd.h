@@ -9,25 +9,38 @@
 using namespace std;
 
 class Value{
-    private:
+    public:
     double data;
     mutable double grad;
     function<void()> _backward;
     set<const Value*> _prev;
     string _op;
 
-    void build_topo(const Value* v, vector<const Value*> &topo, set<const Value*> &visited) const{
-        if (visited.find(v) == visited.end()){
-            visited.insert(v);
-            
-            for (auto x: v->_prev){
-                build_topo(x, topo, visited);
-            }
-            topo.push_back(v);
+    void build_topo(const Value* v, vector<const Value*> &topo, set<const Value*> &visited) const {
+        if (v == nullptr) {
+            cerr << "Warning: Null pointer passed to build_topo. Skipping this node." << endl;
+            return; 
         }
+
+        if (visited.find(v) != visited.end()) {
+            cerr << "Error: Cycle detected in the computational graph." << endl;
+            return; // We still need to stop for cycles to avoid infinite loops
+        }
+
+        visited.insert(v);
+
+        for (auto x : v->_prev) {
+            if (x != nullptr) { 
+                build_topo(x, topo, visited);
+            } else {
+                cerr << "Warning: Null pointer encountered in _prev set. Skipping this connection." << endl;
+                // Continue building the topological order even with null pointers
+            }
+        }
+
+        topo.push_back(v);
     }
 
-    public:
     Value(double data, set<const Value*> children = {}, string op = ""):
         data(data), grad(0), _prev(children), _op(op) {
              _backward = [](){};
@@ -47,6 +60,19 @@ class Value{
         out._backward = [this, &other, &out](){
             const_cast<Value*>(this)->grad += out.grad;
             const_cast<Value&>(other).grad += out.grad;
+        };
+
+        return out;
+    }
+
+    Value operator-(const Value &other) const{
+        Value out(this->data -other.data);
+        out._prev = {this, &other};
+        out._op = "-";
+
+        out._backward = [this, &other, &out](){
+            const_cast<Value*>(this)->grad += out.grad;
+            const_cast<Value&>(other).grad -= out.grad;
         };
 
         return out;
@@ -151,25 +177,24 @@ class Value{
     }
     
 
-    void backward() const {                                                                                                                                                                                                                      
+    void backward() const {  
+                                                                                                                                                                                                                          
         std::vector<const Value*> topo;                                                                                                                                                                                                          
-        std::set<const Value*> visited;                                                                                                                                                                                                          
+        std::set<const Value*> visited; 
         build_topo(this, topo, visited);                                                                                                                                                                                                         
-                                                                                                                                                                                                                                                
         const_cast<Value*>(this)->grad = 1;                                                                                                                                                                                                      
-        for (auto it = topo.rbegin(); it != topo.rend(); ++it) {                                                                                                                                                                                 
+        for (auto it = topo.rbegin(); it != topo.rend(); ++it) {    
             (*it)->_backward();                                                                                                                                                                                                                  
         }                                                                                                                                                                                                                                        
     }  
 
+    bool operator!=(std::nullptr_t) const {
+        return this != nullptr; // Compare the 'this' pointer to nullptr
+    }
 
-    Value operator-() const {                                                                                                                                                                                                                    
-        return *this * Value(-1);                                                                                                                                                                                                                
-    }                                                                                                                                                                                                                                            
+
                                                                                                                                                                                                                                                 
-    Value operator-(const Value& other) const {                                                                                                                                                                                                  
-        return *this + (-other);                                                                                                                                                                                                                 
-    }                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
                                                                                                                                                                                                                                                 
     Value operator/(const Value& other) const {                                                                                                                                                                                                  
         return *this * other.power(-1);                                                                                                                                                                                                            
