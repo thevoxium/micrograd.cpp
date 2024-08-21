@@ -88,6 +88,19 @@ class Value{
         return out;
     }
 
+    Value sigmoid() const{
+        double sig = 1.0/(1+exp(-1*this->data));
+        double der = sig * (1-sig);
+        Value out(sig);
+        out._prev = {this};
+        out._op = "sig";
+        
+        out._backward = [this, &out, der](){
+            const_cast<Value*>(this)->grad += der*out.grad;
+        };
+        return out;
+    }
+
     void backward() const {                                                                                                                                                                                                                      
         std::vector<const Value*> topo;                                                                                                                                                                                                          
         std::set<const Value*> visited;                                                                                                                                                                                                          
