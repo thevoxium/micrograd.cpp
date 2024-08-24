@@ -12,7 +12,7 @@ int main() {
     x.push_back(&t);
   }
   for (int i=0; i<1; i++){
-    Value t(90);
+    Value t(91.789);
     y.push_back(&t);
   }
   for (int i=0; i<1; i++){
@@ -22,8 +22,8 @@ int main() {
 
 
   double learningRate = 0.00001;
-  int epochs = 1000;
+  int epochs = 100;
 
-  train(epochs, learningRate, params, x, y);
+  train(epochs, learningRate, params, x, y, 0.0);
   return 0;
 }

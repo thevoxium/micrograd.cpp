@@ -2,13 +2,13 @@
 
 vector<Value*> UpdateParameters(vector<Value*>& params, double learningRate){
     for (Value* param : params){
-        param->data -= learningRate * param->grad;
+        param->data -= (learningRate * param->grad);
         param->grad = 0;
     }
     return params;
 }
 
-void train(int epochs, double learningRate, vector<Value*>& p, vector<Value*>& x, vector<Value*>& y) {
+void train(int epochs, double learningRate, vector<Value*>& p, vector<Value*>& x, vector<Value*>& y, double l2) {
     Value w(p[0]->data);
     for (int epoch = 0; epoch < epochs; epoch++) {
         Value xi(x[0]->data);
@@ -17,9 +17,8 @@ void train(int epochs, double learningRate, vector<Value*>& p, vector<Value*>& x
         Value pred = w * xi; 
         Value error = pred - yi;
         Value squared_error = error*error;
-
-        Value loss = squared_error * 0.2;
-
+        Value reg(w.data*w.data*l2);
+        Value loss = squared_error+reg;
         //cout << "Epoch: " << epoch + 1 << " - Loss: " << loss.data << endl;
         
         loss.backward(); 
